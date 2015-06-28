@@ -54,6 +54,23 @@ class ECDSATest(unittest.TestCase):
 
         self.assertEquals(reference_sig, sig)
 
+        # verify
+        self.assertTrue(
+            ecdsa.ecdsa_verify(self.curve,
+                               lambda m: util.be2int(hashlib.sha256(m).digest()),
+                               256,
+                               pub,
+                               'abc',
+                               sig))
+
+        self.assertTrue(not
+            ecdsa.ecdsa_verify(self.curve,
+                               lambda m: util.be2int(hashlib.sha256(m).digest()),
+                               256,
+                               pub,
+                               'abcdef',
+                               sig))
+
 
 if __name__ == '__main__':
     unittest.main()
