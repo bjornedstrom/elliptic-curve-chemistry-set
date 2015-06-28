@@ -5,6 +5,7 @@ import random
 
 import field
 import curve
+import util
 
 
 def randint(a, b):
@@ -26,6 +27,18 @@ class ECCBase(object):
 
         return (public, private)
 
+    def canonical_binary_form_private(self, private):
+        raise NotImplementedError()
+
+    def canonical_binary_form_public(self, public):
+        raise NotImplementedError()
+
+    def binary_to_private(self, private_bin):
+        raise NotImplementedError()
+
+    def binary_to_public(self, public_bin):
+        raise NotImplementedError()
+
 
 class ECC_Curve25519(ECCBase):
     curve = curve.MontgomeryCurve(486662, 1, field.Field(2**255 - 19))
@@ -34,6 +47,48 @@ class ECC_Curve25519(ECCBase):
 
     def generate_private_key(self, seed):
         return 2**254 + 8 * randint(0, 2**251 - 1)
+
+    def canonical_binary_form_private(self, private):
+        return util.int2le(private, 32)
+
+    def canonical_binary_form_public(self, public):
+        return util.int2le(public[0], 32)
+
+    def binary_to_private(self, private_bin):
+        return util.le2int(private_bin)
+
+    def binary_to_public(self, public_bin):
+        raise NotImplementedError('AFAIK there is no canonical way to recover y from x')
+
+    def non_canonical_binary_to_public(self, public_bin):
+        x = util.le2int(public_bin)
+        P1, P2 = self.curve.get_y(x)
+
+        """
+        print
+        print P1[1] <= (self.curve.gf.p - 1)/2
+        print P1
+        print P2
+        #print (P1[0] % 2, P1[1] % 2)
+        #print (P2[0] % 2, P2[1] % 2)
+        print
+
+        # XXX
+        q = self.curve.gf.p
+        I = pow(2, (q-1)/4, q)
+        yy = x**3 + self.curve.a*x**2 + x
+        y = pow(yy, (q+3)/8, q)
+        if (y*y - yy) % q != 0:
+            y = (y*I) % q
+        if y % 2 != 0:
+            y = q-y
+
+        #print (x, y)
+        #print
+
+        return max(P1, P2)"""
+
+        return P1 # XXX
 
 
 class ECC_Ed25519(ECC_Curve25519):
