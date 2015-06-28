@@ -23,7 +23,7 @@ class ECCBase(object):
 
     def generate_key_pair(self, seed):
         private = self.generate_private_key(seed)
-        public = curve.montgomery_ladder(private, self.base_point)
+        public = curve.montgomery_ladder(private, self.base_point, self.curve)
 
         return (public, private)
 
@@ -90,6 +90,11 @@ class ECC_Curve25519(ECCBase):
 
         return P1 # XXX
 
+    def ecdh(self, my_private, other_public):
+        # Curve25519 only cares about the x affine coordinate.
+        return ecdh(self, my_private, other_public)[0]
+
+
 
 class ECC_Ed25519(ECC_Curve25519):
     curve = curve.TwistedEdwardsCurve(
@@ -113,3 +118,9 @@ class ECC_Curve41417(ECCBase):
     def generate_private_key(self, seed):
         # As Curve25519 this one has a cofactor of 8.
         return 2**413 + 8 * randint(0, 2**410 - 1)
+
+
+def ecdh(curve_obj, my_private, other_public):
+    """Derive the shared secret in ECDH."""
+
+    return curve.montgomery_ladder(my_private, other_public, curve_obj.curve)

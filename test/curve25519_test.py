@@ -7,9 +7,40 @@ import asymmetric
 import reference_ed25519 as ref_ed
 #import re
 import curve as curvemod
+import util
 
 def arr2str(arr):
     return ''.join(map(chr, arr))
+
+
+class Curve25519ECDHTest(unittest.TestCase):
+    def setUp(self):
+        self.curve = asymmetric.ECC_Curve25519()
+
+    def test_key_generation(self):
+        alice_pub, alice_priv = self.curve.generate_key_pair(None)
+        bob_pub, bob_priv = self.curve.generate_key_pair(None)
+
+        ss_a = self.curve.ecdh(alice_priv, bob_pub)
+        ss_b = self.curve.ecdh(bob_priv, alice_pub)
+
+        self.assertEquals(ss_a, ss_b)
+
+    def test_nacl_test_vector(self):
+        def decode(s):
+            ss = s.split()
+            return arr2str([int(a, 16) for a in ss])
+
+        S_a = 0x6A2CB91DA5FB77B12A99C0EB872F4CDF4566B25172C1163C7DA518730A6D0770
+        P_a = decode('85 20 F0 09 89 30 A7 54 74 8B 7D DC B4 3E F7 5A 0D BF 3A 0D 26 38 1A F4 EB A4 A9 8E AA 9B 4E 6A')
+        S_b = 0x6BE088FF278B2F1CFDB6182629B13B6FE60E80838B7FE1794B8A4A627E08AB58
+        P_b = decode('DE 9E DB 7D 7B 7D C1 B4 D3 5B 61 C2 EC E4 35 37 3F 83 43 C8 5B 78 67 4D AD FC 7E 14 6F 88 2B 4F')
+        SS = decode('4A 5D 9D 5B A4 CE 2D E1 72 8E 3B F4 80 35 0F 25 E0 7E 21 C9 47 D1 9E 33 76 F0 9B 3C 1E 16 17 42')
+
+        SS_int = self.curve.non_canonical_binary_to_public(SS)[0]
+
+        self.assertEquals(SS_int, self.curve.ecdh(S_a, self.curve.non_canonical_binary_to_public(P_b)))
+        self.assertEquals(SS_int, self.curve.ecdh(S_b, self.curve.non_canonical_binary_to_public(P_a)))
 
 
 # https://github.com/Yawning/libelligator/blob/master/src/tests/kat.cc
