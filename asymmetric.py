@@ -22,6 +22,9 @@ class ECCBase(object):
     def generate_private_key(self, seed):
         return randint(1, self.order - 1)
 
+    def derive_public_key(self, private):
+        return curve.montgomery_ladder(private, self.base_point, self.curve)
+
     def generate_key_pair(self, seed):
         private = self.generate_private_key(seed)
         public = curve.montgomery_ladder(private, self.base_point, self.curve)
