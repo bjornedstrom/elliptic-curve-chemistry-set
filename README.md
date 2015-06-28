@@ -14,9 +14,10 @@ This code is meant for experimentation and educational purposes, it is not meant
 - An experimental and half-working, not-tested-at-all (because of lack of test vectors) implementation of Curve41417.
 - A barely started implementation of converting curves in one shape to a different shape.
 - A slow reference implementation of Elligator2.
-- Point decompressing that doesn't work very reliably (TODO: fix this).
+- Point decompressing.
 - Completely trivial code for arithmetic in GF(p).
 - Some code for ECDH.
+- Some code for ECDSA.
 
 ## License
 
