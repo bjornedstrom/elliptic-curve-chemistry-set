@@ -6,6 +6,7 @@ import random
 import field
 import curve
 import util
+import ecdh
 
 
 def randint(a, b):
@@ -92,7 +93,7 @@ class ECC_Curve25519(ECCBase):
 
     def ecdh(self, my_private, other_public):
         # Curve25519 only cares about the x affine coordinate.
-        return ecdh(self, my_private, other_public)[0]
+        return ecdh.ecdh(self, my_private, other_public)[0]
 
 
 
@@ -118,9 +119,3 @@ class ECC_Curve41417(ECCBase):
     def generate_private_key(self, seed):
         # As Curve25519 this one has a cofactor of 8.
         return 2**413 + 8 * randint(0, 2**410 - 1)
-
-
-def ecdh(curve_obj, my_private, other_public):
-    """Derive the shared secret in ECDH."""
-
-    return curve.montgomery_ladder(my_private, other_public, curve_obj.curve)

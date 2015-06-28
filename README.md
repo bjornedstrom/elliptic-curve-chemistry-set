@@ -16,6 +16,7 @@ This code is meant for experimentation and educational purposes, it is not meant
 - A slow reference implementation of Elligator2.
 - Point decompressing that doesn't work very reliably (TODO: fix this).
 - Completely trivial code for arithmetic in GF(p).
+- Some code for ECDH.
 
 ## License
 
