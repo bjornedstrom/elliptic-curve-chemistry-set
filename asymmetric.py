@@ -7,11 +7,7 @@ import field
 import curve
 import util
 import ecdh
-
-
-def randint(a, b):
-    # XXX: This is not cryptographically secure.
-    return random.randint(a, b)
+import util
 
 
 class ECCBase(object):
@@ -20,7 +16,7 @@ class ECCBase(object):
     base_point = None
 
     def generate_private_key(self, seed):
-        return randint(1, self.order - 1)
+        return util.randint(1, self.order - 1)
 
     def derive_public_key(self, private):
         return curve.montgomery_ladder(private, self.base_point, self.curve)
@@ -50,7 +46,7 @@ class ECC_Curve25519(ECCBase):
     base_point = (9L, 14781619447589544791020593568409986887264606134616475288964881837755586237401L)
 
     def generate_private_key(self, seed):
-        return 2**254 + 8 * randint(0, 2**251 - 1)
+        return 2**254 + 8 * util.randint(0, 2**251 - 1)
 
     def canonical_binary_form_private(self, private):
         return util.int2le(private, 32)
@@ -121,4 +117,4 @@ class ECC_Curve41417(ECCBase):
 
     def generate_private_key(self, seed):
         # As Curve25519 this one has a cofactor of 8.
-        return 2**413 + 8 * randint(0, 2**410 - 1)
+        return 2**413 + 8 * util.randint(0, 2**410 - 1)
