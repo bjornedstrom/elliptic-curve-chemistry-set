@@ -10,7 +10,7 @@ This code is meant for experimentation and educational purposes, it is not meant
 - Addition, Doubling and Multiplication.
 - Some support for Projective coordinates (or XY coordinates if X:Y:Z projective are missing).
 - A half-assed generalization of EdDSA ruthlessly mangled from djb:s reference implementation.
-- Convenient classes for Curve25519, Ed25519 and NIST P-256.
+- Convenient classes for Curve25519, Ed25519 and NIST P-256, P-384.
 - An experimental and half-working, not-tested-at-all (because of lack of test vectors) implementation of Curve41417.
 - A barely started implementation of converting curves in one shape to a different shape.
 - A slow reference implementation of Elligator2.
