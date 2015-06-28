@@ -23,53 +23,79 @@ class ECDSATest(unittest.TestCase):
             'private': hex2int("""DC51D386 6A15BACD E33D96F9 92FCA99D A7E6EF09 34E70975 59C27F16 14C88A7F"""),
             },
         'msg1': {
-            'msg': hex2int("""BA7816BF 8F01CFEA 414140DE 5DAE2223 B00361A3 96177A9C B410FF61 F20015AD"""),
+            'msg': "abc",
             'sig': (hex2int("""CB28E099 9B9C7715 FD0A80D8 E47A7707 9716CBBF 917DD72E 97566EA1 C066957C"""),
                     hex2int("""86FA3BB4 E26CAD5B F90B7F81 899256CE 7594BB1E A0C89212 748BFF3B 3D5B0315""")),
             'k': hex2int("""9E56F509 196784D9 63D1C0A4 01510EE7 ADA3DCC5 DEE04B15 4BF61AF1 D5A6DECE"""),
+            },
+
+        # https://www.nsa.gov/ia/_files/ecdsa.pdf
+        'key2w': {
+            'public': (
+                hex2int("8101ece4 7464a6ea d70cf69a 6e2bd3d8 8691a326 2d22cba4 f7635eaf f26680a8"),
+                hex2int("d8a12ba6 1d599235 f67d9cb4 d58f1783 d3ca43e7 8f0a5aba a6240799 36c0c3a9")),
+            'private': hex2int("70a12c2d b16845ed 56ff68cf c21a472b 3f04d7d6 851bf634 9f2d7d5b 3452b38a"),
+            },
+        'msg2': {
+            'msg': "This is only a test message. It is 48 bytes long",
+            'sig': (hex2int("7214bc96 47160bbd 39ff2f80 533f5dc6 ddd70ddf 86bb8156 61e805d5 d4e6f27c"),
+                    hex2int("7d1ff961 980f961b daa3233b 6209f401 3317d3e3 f9e14935 92dbeaa1 af2bc367")),
+            'k': hex2int("580ec00d 85643433 4cef3f71 ecaed496 5b12ae37 fa47055b 1965c7b1 34ee45d0"),
             }
     }
 
     def test_1(self):
-        self.curve = asymmetric.ECC_NISTP256()
-
+        curve_obj = asymmetric.ECC_NISTP256()
         priv = util.be2int(self.TEST_VECTORS['key1w']['private'])
-        #print [priv]
-        #print [self.curve.derive_public_key(priv)]
-
         pub = tuple(map(util.be2int, self.TEST_VECTORS['key1w']['public']))
-        #print [pub]
-
-        self.assertEquals(pub, self.curve.derive_public_key(priv))
-
-        sig = ecdsa.ecdsa_sign(self.curve,
-                               lambda m: util.be2int(hashlib.sha256(m).digest()),
-                               256,
-                               priv,
-                               'abc',
-                               util.be2int(self.TEST_VECTORS['msg1']['k']))
-
-        #print [sig]
+        hash_func = lambda m: util.be2int(hashlib.sha256(m).digest())
+        hash_bits = 256
+        msg = self.TEST_VECTORS['msg1']['msg']
+        k = util.be2int(self.TEST_VECTORS['msg1']['k'])
         reference_sig = tuple(map(util.be2int, self.TEST_VECTORS['msg1']['sig']))
+
+        self._test_ecdsa(curve_obj, priv, pub, hash_func, hash_bits, msg, k, reference_sig)
+
+    def test_2(self):
+        curve_obj = asymmetric.ECC_NISTP256()
+        priv = util.be2int(self.TEST_VECTORS['key2w']['private'])
+        pub = tuple(map(util.be2int, self.TEST_VECTORS['key2w']['public']))
+        hash_func = lambda m: util.be2int(hashlib.sha256(m).digest())
+        hash_bits = 256
+        msg = self.TEST_VECTORS['msg2']['msg']
+        k = util.be2int(self.TEST_VECTORS['msg2']['k'])
+        reference_sig = tuple(map(util.be2int, self.TEST_VECTORS['msg2']['sig']))
+
+        self._test_ecdsa(curve_obj, priv, pub, hash_func, hash_bits, msg, k, reference_sig)
+
+    def _test_ecdsa(self, curve_obj, priv, pub, hash_func, hash_bits, msg, k, reference_sig):
+        self.assertEquals(pub, curve_obj.derive_public_key(priv))
+
+        sig = ecdsa.ecdsa_sign(curve_obj,
+                               hash_func,
+                               hash_bits,
+                               priv,
+                               msg,
+                               k)
 
         self.assertEquals(reference_sig, sig)
 
         # verify
         self.assertTrue(
-            ecdsa.ecdsa_verify(self.curve,
-                               lambda m: util.be2int(hashlib.sha256(m).digest()),
-                               256,
+            ecdsa.ecdsa_verify(curve_obj,
+                               hash_func,
+                               hash_bits,
                                pub,
-                               'abc',
-                               sig))
+                               msg,
+                               reference_sig))
 
         self.assertTrue(not
-            ecdsa.ecdsa_verify(self.curve,
-                               lambda m: util.be2int(hashlib.sha256(m).digest()),
-                               256,
+            ecdsa.ecdsa_verify(curve_obj,
+                               hash_func,
+                               hash_bits,
                                pub,
                                'abcdef',
-                               sig))
+                               reference_sig))
 
 
 if __name__ == '__main__':
