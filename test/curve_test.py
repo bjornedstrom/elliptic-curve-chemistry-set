@@ -55,6 +55,9 @@ class CommonCurveTestsMixin(object):
         self.assertEquals(self.MUL_P_1, montgomery_ladder(self.MUL_K_1, self.bp, self.curve))
         self.assertEquals(self.MUL_P_2, montgomery_ladder(self.MUL_K_2, self.bp, self.curve))
 
+    def test_generator(self):
+        self.assertEquals(self.curve.neutral_point(), montgomery_ladder(self.bp_order, self.bp, self.curve))
+
 
 class ProjectiveCoordinateTestsMixin(object):
     def test_projective_single_addition(self):
@@ -133,6 +136,7 @@ class ShortWeierstrassTestCase(unittest.TestCase, CommonCurveTestsMixin, Project
 
         self.curve = nistp256
         self.bp = base_point
+        self.bp_order =  2**256 - 2**224 + 2**192 - 89188191075325690597107910205041859247
 
     def test_getting_y_from_x(self):
         self.assertTrue(self.A in self.curve.get_y(self.A[0]))
@@ -166,6 +170,7 @@ class MontgomeryTestCase(unittest.TestCase, CommonCurveTestsMixin):
 
         self.curve = curve25519
         self.bp = base_point
+        self.bp_order = 2**252 + 27742317777372353535851937790883648493
 
     def test_getting_y_from_x(self):
         self.assertTrue(self.A in self.curve.get_y(self.A[0]))
@@ -222,6 +227,7 @@ class EdwardsTestCase(unittest.TestCase, CommonCurveTestsMixin, ProjectiveCoordi
 
         self.curve = ed41417
         self.bp = (17319886477121189177719202498822615443556957307604340815256226171904769976866975908866528699294134494857887698432266169206165, 34)
+        self.bp_order = 2**411 - 33364140863755142520810177694098385178984727200411208589594759
 
     def test_getting_x_from_y(self):
         self.assertTrue(self.A in self.curve.get_x(self.A[1]))
@@ -274,6 +280,7 @@ class TwistedEdwardsTestCase(unittest.TestCase, CommonCurveTestsMixin, Projectiv
 
         self.curve = ed25519
         self.bp = base_point
+        self.bp_order = 2**252 + 27742317777372353535851937790883648493
 
     def test_getting_x_from_y(self):
         self.assertTrue(self.A in self.curve.get_x(self.A[1]))
