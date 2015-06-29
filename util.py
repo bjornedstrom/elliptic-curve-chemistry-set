@@ -30,11 +30,11 @@ def int2le(integer, pad):
         buf.append(chr(integer & 0xff))
         integer >>= 8
         pad -= 1
+    if pad < 0:
+        raise ValueError('data too long to pad further')
     while pad > 0:
         buf.append('\x00')
         pad -= 1
-    if not buf:
-        return '\x00'
     return ''.join(buf)
 
 
@@ -45,11 +45,11 @@ def int2be(integer, pad):
         buf.insert(0, chr(integer & 0xff))
         integer >>= 8
         pad -= 1
+    if pad < 0:
+        raise ValueError('data too long to pad further')
     while pad > 0:
         buf.insert(0, '\x00')
         pad -= 1
-    if not buf:
-        return '\x00' # XXX
     return ''.join(buf)
 
 
