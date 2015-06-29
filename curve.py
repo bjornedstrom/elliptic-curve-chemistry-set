@@ -10,8 +10,16 @@ class Curve(object):
 
 
 class ShortWeierstrass(Curve):
-    """The short Weierstrass equation y^2 = x^3 + ax + b, where 4a^3+27b^2 is nonzero in F_p, is an elliptic curve over F_p. Every elliptic curve over F_p can be converted to a short Weierstrass equation if p is larger than 3.
+    """An elliptic curve on the form
+
+    y^2 = x^3 + ax + b
+
+    where 4a^3+27b^2 is nonzero in F_p.
+
+    Every elliptic curve over F_p can be converted to a short
+    Weierstrass equation if p is larger than 3.
     """
+
     def __init__(self, a, b, field):
         self.a = a
         self.b = b
@@ -62,23 +70,6 @@ class ShortWeierstrass(Curve):
 
         elif P2 == self.neutral_point_projective():
             return P1
-
-        # add-1998-cmo-2
-        """
-        Y1Z2 = Y1*Z2
-        X1Z2 = X1*Z2
-        Z1Z2 = Z1*Z2
-        u = Y2*Z1-Y1Z2
-        uu = u**2
-        v = X2*Z1-X1Z2
-        vv = v**2
-        vvv = v*vv
-        R = vv*X1Z2
-        A = uu*Z1Z2-vvv-2*R
-        X3 = v*A
-        Y3 = u*(R-A)-vvv*Y1Z2
-        Z3 = vvv*Z1Z2
-        """
 
         # add-2007-bl
         U1 = X1*Z2
@@ -178,8 +169,11 @@ class ShortWeierstrass(Curve):
 
 
 class MontgomeryCurve(Curve):
-    """
+    """An elliptic curve on the form
+
     By^2 = x^3 + Ax^2 + x
+
+    where B(A^2-4) is nonzero in F_p.
     """
 
     def __init__(self, a, b, field):
@@ -303,7 +297,14 @@ class MontgomeryCurve(Curve):
         return (x, -y % self.gf.p)
 
     def to_short_weierstrass(self):
-        """The Montgomery equation By^2 = x^3 + Ax^2 + x, where B(A^2-4) is nonzero in F_p, is an elliptic curve over F_p. Substituting x = Bu-A/3 and y = Bv produces the short Weierstrass equation v^2 = u^3 + au + b where a = (3-A^2)/(3B^2) and b = (2A^3-9A)/(27B^3). Montgomery curves were introduced by 1987 Montgomery. """
+        """Converts the Montgomery curve to a Short Weierstrass curve. Returns a 3-tuple
+
+        (ShortWeierstrassCurve, func, func)
+
+        where the first func maps the montgomery point P to the point on
+        the Short Weierstrass curve P', and the second func is the reverse
+        mapping.
+        """
 
         a = self.gf.div(3 - self.a**2, 3*self.b**2)
         b = self.gf.div(2*self.a**3 - 9*self.a, 27*self.b**3)
@@ -337,7 +338,11 @@ class MontgomeryCurve(Curve):
 
 # Sage Form: y^2 + a1*x*y + a3*y = x^3 + a2*x^2 + a4*x + a6
 class EdwardsCurve(Curve):
-    """The Edwards equation x^2 + y^2 = 1 + dx^2y^2, where d(1-d) is nonzero in F_p, is an elliptic curve over F_p. Substituting x = u/v and y = (u-1)/(u+1) produces the Montgomery equation Bv^2 = u^3 + Au^2 + u where A = 2(1+d)/(1-d) and B = 4/(1-d). Edwards curves were introduced by 2007 Edwards in the case that d is a 4th power. SafeCurves requires Edwards curves to be complete, i.e., for d to not be a square; complete Edwards curves were introduced by 2007 Bernstein–Lange.
+    """An elliptic curve on the form
+
+    x^2 + y^2 = 1 + dx^2y^2
+
+    where d(1-d) is nonzero in F_p.
     """
 
     def __init__(self, c, d, field):
@@ -482,8 +487,16 @@ class EdwardsCurve(Curve):
         x, y = P
         return (-x % self.gf.p, y)
 
-    # XXX
     def to_montgomery(self):
+        """Converts the Edwards curve to a Montgomery curve. Returns a 3-tuple
+
+        (MontgomeryCurve, func, func)
+
+        where the first func maps the edwards point P to the point on
+        the montgomery curve P', and the second func is the reverse
+        mapping.
+        """
+
         a = self.gf.div(2*(1+self.d), 1-self.d)
         b = self.gf.div(4, 1-self.d)
 

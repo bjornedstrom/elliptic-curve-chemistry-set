@@ -289,8 +289,8 @@ class TwistedEdwardsTestCase(unittest.TestCase, CommonCurveTestsMixin, Projectiv
     def test_montgomery_mapping(self):
         monty, map_func_to, map_func_from = self.curve.to_montgomery()
 
-        print map_func_to((3, 1))
-        print map_func_from(monty.neutral_point())
+        #print map_func_to((3, 1))
+        #print map_func_from(monty.neutral_point())
 
         self.assertEquals(
             self.Ax2,
