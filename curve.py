@@ -318,7 +318,15 @@ class MontgomeryCurve(Curve):
             return (x_, y_)
 
         def weierstrass_point_to_montgomery_point(P):
-            raise NotImplementedError('this is not done yet')
+            x_, y_ = P
+
+            # TODO: any exception cases? I don't think so (no division by 0 at least)
+            a3 = self.gf.div(self.a, 3)
+            x_plus_a3 = self.gf.mul(x_, self.b)
+            x = self.gf.sub(x_plus_a3, a3)
+            y = self.gf.mul(y_, self.b)
+
+            return (x, y)
 
         return ShortWeierstrass(a, b, self.gf), montgomery_point_to_weierstrass_point, weierstrass_point_to_montgomery_point
 
@@ -488,7 +496,15 @@ class EdwardsCurve(Curve):
             return (x_, y_)
 
         def montgomery_point_to_edwards_point(P):
-            raise NotImplementedError('this is not done yet')
+            x_, y_ = P
+
+            if y_ == 0 or self.gf.add(x_, 1) == 0:
+                raise ZeroDivisionError('invalid conversion')
+
+            x = self.gf.div(x_, y_)
+            y = self.gf.div(x_ - 1, x_ + 1)
+
+            return (x, y)
 
         return MontgomeryCurve(a, b, self.gf), edwards_point_to_montgomery_point, montgomery_point_to_edwards_point
 
