@@ -174,6 +174,26 @@ class MontgomeryTestCase(unittest.TestCase, CommonCurveTestsMixin):
         self.assertTrue(self.AplusB in self.curve.get_y(self.AplusB[0]))
         self.assertTrue(self.negB in self.curve.get_y(self.negB[0]))
 
+    def test_convert_to_short_weierstrass(self):
+
+        # Test with Curve41417
+        field = Field(2**414 - 17)
+        curve41417 = EdwardsCurve(1, 3617, Field(2**414 - 17))
+        curve41417_bp = (17319886477121189177719202498822615443556957307604340815256226171904769976866975908866528699294134494857887698432266169206165, 34)
+
+        # this is tested in the Montgomery test case.
+        curve41417monty, P_to_monty, P_from_monty = curve41417.to_montgomery()
+        curve41417monty_bp = P_to_monty(curve41417_bp)
+
+        # now finally convert to short weierstrass
+
+        weiss, P_to_weiss, P_from_weiss = curve41417monty.to_short_weierstrass()
+
+        self.assertEquals(42307582002575910332922579714097346549017899709713998034217522897561970639123926132812109468141778230245837569601494931198756, weiss.a)
+        self.assertEquals(42307582002575910332922579714097346549017899709713998034217522897561970639123926132812109468141778230245837569601494877203573, weiss.b)
+
+        self.assertEquals((33333246426271929353211729471713060917408042195532240875444108949594279897491578165245904429445037393527023539686026309646457, 2236671449683305925398969480507433209994648385971289644656272082874689574321388075188206152980709096399807140440181156775230), P_to_weiss(curve41417monty_bp))
+
 
 class EdwardsTestCase(unittest.TestCase, CommonCurveTestsMixin, ProjectiveCoordinateTestsMixin):
 
@@ -214,6 +234,14 @@ class EdwardsTestCase(unittest.TestCase, CommonCurveTestsMixin, ProjectiveCoordi
 
     def test_shitty_test_data(self):
         raise Exception('data not independently verified for Edwards Curve test case')
+
+    def test_convert_to_montgomery(self):
+        monty, P_to_monty, P_from_monty = self.curve.to_montgomery()
+
+        self.assertEquals(16426948321796620051831665353593106901222657962510634192489325815314437714969577513956914185086022299575540914745713186888052, monty.a)
+        self.assertEquals(16426948321796620051831665353593106901222657962510634192489325815314437714969577513956914185086022299575540914745713186888054, monty.b)
+
+        self.assertEquals((39743486123631915767290908216273264939986511848519210274567976055285487570086112427793193742799852276897604989625646753807374, 839933412164472433702663125412881421097707462819558268773516747868629183550784604331227615346870906026576625124321601338194), P_to_monty(self.bp))
 
 
 class TwistedEdwardsTestCase(unittest.TestCase, CommonCurveTestsMixin, ProjectiveCoordinateTestsMixin):

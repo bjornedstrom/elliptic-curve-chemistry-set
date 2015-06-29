@@ -308,7 +308,19 @@ class MontgomeryCurve(Curve):
         a = self.gf.div(3 - self.a**2, 3*self.b**2)
         b = self.gf.div(2*self.a**3 - 9*self.a, 27*self.b**3)
 
-        return ShortWeierstrass(a, b, self.gf)
+        def montgomery_point_to_weierstrass_point(P):
+            x, y = P
+
+            a3 = self.gf.div(self.a, 3)
+            x_ = self.gf.div(x + a3, self.b)
+            y_ = self.gf.div(y, self.b)
+
+            return (x_, y_)
+
+        def weierstrass_point_to_montgomery_point(P):
+            raise NotImplementedError('this is not done yet')
+
+        return ShortWeierstrass(a, b, self.gf), montgomery_point_to_weierstrass_point, weierstrass_point_to_montgomery_point
 
     def __str__(self):
         return 'Montgomery Curve %sy^2 = x^3 + %sx^2 + x over GF(%s)' % (
@@ -467,9 +479,18 @@ class EdwardsCurve(Curve):
         a = self.gf.div(2*(1+self.d), 1-self.d)
         b = self.gf.div(4, 1-self.d)
 
-        map_x = lambda x: None
+        def edwards_point_to_montgomery_point(P):
+            x, y = P
 
-        return MontgomeryCurve(a, b, self.gf)
+            x_ = self.gf.div(1 + y, 1 - y)
+            y_ = self.gf.div(x_, x)
+
+            return (x_, y_)
+
+        def montgomery_point_to_edwards_point(P):
+            raise NotImplementedError('this is not done yet')
+
+        return MontgomeryCurve(a, b, self.gf), edwards_point_to_montgomery_point, montgomery_point_to_edwards_point
 
     def __str__(self):
         return 'Edwards Curve x^2 + y^2 = 1 + %sx^2y^2 over GF(%s)' % (
