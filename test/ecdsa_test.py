@@ -122,6 +122,35 @@ class ECDSATest(unittest.TestCase):
                                'abcdef',
                                reference_sig))
 
+    def test_break(self):
+        curve_obj = asymmetric.ECC_NISTP256()
+        priv = util.be2int(self.TEST_VECTORS['key1w']['private'])
+        pub = tuple(map(util.be2int, self.TEST_VECTORS['key1w']['public']))
+        hash_func = lambda m: util.be2int(hashlib.sha256(m).digest())
+        hash_bits = 256
+
+        msg1 = self.TEST_VECTORS['msg1']['msg']
+        msg2 = self.TEST_VECTORS['msg2']['msg']
+        k = util.be2int(self.TEST_VECTORS['msg1']['k'])
+
+        sig1 = ecdsa.ecdsa_sign(curve_obj,
+                                hash_func,
+                                hash_bits,
+                                priv,
+                                msg1,
+                                k)
+
+        sig2 = ecdsa.ecdsa_sign(curve_obj,
+                                hash_func,
+                                hash_bits,
+                                priv,
+                                msg2,
+                                k)
+
+        recovered = ecdsa.break_ecdsa(curve_obj, hash_func, hash_bits, sig1, sig2, msg1, msg2)
+
+        self.assertEquals((k, priv), recovered)
+
 
 if __name__ == '__main__':
     unittest.main()

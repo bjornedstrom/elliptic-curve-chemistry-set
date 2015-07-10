@@ -7,6 +7,26 @@ import util
 import numbertheory
 
 
+def break_ecdsa(curve_obj, hash_int, hash_num_bits, sig1, sig2, msg1, msg2):
+    (r, s) = sig1
+    (r_, s_) = sig2
+    if r != r_:
+        raise ValueError('cannot attack this')
+
+    e = hash_int(msg1)
+    L_n = util.count_bits(curve_obj.order)
+    z = e >> max(hash_num_bits - L_n, 0)
+
+    e_ = hash_int(msg2)
+    z_ = e_ >> max(hash_num_bits - L_n, 0)
+
+    k = ((z - z_) * numbertheory.inverse_of(s - s_, curve_obj.order)) % curve_obj.order
+
+    priv = ((s*k - z) * numbertheory.inverse_of(r, curve_obj.order)) % curve_obj.order
+
+    return (k, priv)
+
+
 def ecdsa_sign(curve_obj, hash_int, hash_num_bits, private_key, message, k=None):
     if k is None:
         k = util.randint(1, curve_obj.order - 1)
