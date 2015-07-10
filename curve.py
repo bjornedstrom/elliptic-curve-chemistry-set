@@ -163,6 +163,10 @@ class ShortWeierstrass(Curve):
         x, y = P
         return (x, -y % self.gf.p)
 
+    def to_sage_repr(self):
+        # Sage Form: y^2 + a1*x*y + a3*y = x^3 + a2*x^2 + a4*x + a6
+        return 'EllipticCurve(GF(%s), [%s, %s])' % (self.gf.p, self.a, self.b)
+
     def __str__(self):
         return 'Weierstrass Curve y^2 = x^3 + %sx + %s over GF(%s)' % (
             self.a, self.b, self.gf.p)
@@ -334,6 +338,13 @@ class MontgomeryCurve(Curve):
     def __str__(self):
         return 'Montgomery Curve %sy^2 = x^3 + %sx^2 + x over GF(%s)' % (
             self.b, self.a, self.gf.p)
+
+    def to_sage_repr(self):
+        # Sage Form: y^2 + a1*x*y + a3*y = x^3 + a2*x^2 + a4*x + a6
+        if self.b != 1:
+            raise NotImplementedError('can only directly convert to the sage repr if b == 1')
+
+        return 'EllipticCurve(GF(%s), [0, %s, 0, 1, 0])' % (self.gf.p, self.a)
 
 
 # Sage Form: y^2 + a1*x*y + a3*y = x^3 + a2*x^2 + a4*x + a6
