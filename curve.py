@@ -698,7 +698,7 @@ class TwistedEdwardsCurve(Curve):
         return MontgomeryCurve(A, B, self.gf), map_affine_to, map_affine_from
 
 
-def montgomery_ladder(n, P, curve):
+def mul(n, P, curve):
     R0 = curve.neutral_point()
     R1 = P
 
@@ -719,7 +719,7 @@ def montgomery_ladder(n, P, curve):
     return R0
 
 
-def montgomery_ladder_projective(n, P, curve):
+def mul_projective(n, P, curve):
     R0 = curve.neutral_point_projective()
     R1 = P
 

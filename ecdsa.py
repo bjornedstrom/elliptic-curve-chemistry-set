@@ -51,7 +51,7 @@ def ecdsa_sign(curve_obj, hash_int, hash_num_bits, private_key, message, k=None)
     z = e >> max(hash_num_bits - L_n, 0)
 
     while True:
-        (x1, y1) = curve.montgomery_ladder(k, curve_obj.base_point, curve_obj.curve)
+        (x1, y1) = curve.mul(k, curve_obj.base_point, curve_obj.curve)
         r = x1 % curve_obj.order
         if r == 0:
             continue
@@ -78,7 +78,7 @@ def ecdsa_verify(curve_obj, hash_int, hash_num_bits, public_key, message, signat
     if not curve_obj.curve.point_on_curve(public_key):
         return False
 
-    if not curve.montgomery_ladder(curve_obj.order, public_key, curve_obj.curve) == curve_obj.curve.neutral_point():
+    if not curve.mul(curve_obj.order, public_key, curve_obj.curve) == curve_obj.curve.neutral_point():
         return False
 
     (r, s) = signature
@@ -99,8 +99,8 @@ def ecdsa_verify(curve_obj, hash_int, hash_num_bits, public_key, message, signat
     u_2 = (r * w) % curve_obj.order
 
     (x1, y1) = curve_obj.curve.add_points(
-        curve.montgomery_ladder(u_1, curve_obj.base_point, curve_obj.curve),
-        curve.montgomery_ladder(u_2, public_key, curve_obj.curve)
+        curve.mul(u_1, curve_obj.base_point, curve_obj.curve),
+        curve.mul(u_2, public_key, curve_obj.curve)
         )
 
     return (r % curve_obj.order) == x1

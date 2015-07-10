@@ -79,7 +79,7 @@ class Elligator2Test(unittest.TestCase):
         Repr = ref_ed.decodeint(''.join(map(chr, REPR)))
         X = ref_ed.decodeint(''.join(map(chr, PUB)))
         Priv = ref_ed.decodeint(''.join(map(chr, PRIV)))
-        Pub = curvemod.montgomery_ladder(Priv, self.curve25519.base_point, self.curve25519.curve)
+        Pub = curvemod.mul(Priv, self.curve25519.base_point, self.curve25519.curve)
 
         # Check valid
         valid = True

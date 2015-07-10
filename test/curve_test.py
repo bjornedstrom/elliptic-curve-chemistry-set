@@ -3,7 +3,7 @@
 
 import unittest
 from field import Field
-from curve import ShortWeierstrass, MontgomeryCurve, EdwardsCurve, TwistedEdwardsCurve, montgomery_ladder, montgomery_ladder_projective
+from curve import ShortWeierstrass, MontgomeryCurve, EdwardsCurve, TwistedEdwardsCurve, mul, mul_projective
 
 
 class CommonCurveTestsMixin(object):
@@ -12,13 +12,13 @@ class CommonCurveTestsMixin(object):
         self.assertEquals(self.AplusB, self.curve.add_points(self.B, self.A))
 
     def test_multiplication_by_0(self):
-        self.assertEquals(self.curve.neutral_point(), montgomery_ladder(0, self.A, self.curve))
+        self.assertEquals(self.curve.neutral_point(), mul(0, self.A, self.curve))
 
     def test_multiplication_by_1_equals_self(self):
-        self.assertEquals(self.A, montgomery_ladder(1, self.A, self.curve))
+        self.assertEquals(self.A, mul(1, self.A, self.curve))
 
     def test_multiplication_by_2_equals_doubling(self):
-        self.assertEquals(self.curve.double_point(self.A), montgomery_ladder(2, self.A, self.curve))
+        self.assertEquals(self.curve.double_point(self.A), mul(2, self.A, self.curve))
 
     def test_addition_common(self):
         self.assertEquals(self.AplusB, self.curve.add_points(self.A, self.B))
@@ -30,7 +30,7 @@ class CommonCurveTestsMixin(object):
     #    self.assertEquals(self.Ax2, self.curve.add_points(self.A, self.A))
 
     def test_multiplication_by_1(self):
-        self.assertEquals(self.A, montgomery_ladder(1, self.A, self.curve))
+        self.assertEquals(self.A, mul(1, self.A, self.curve))
 
     def test_invert_point(self):
         self.assertEquals(self.negB, self.curve.invert_point(self.B))
@@ -52,11 +52,11 @@ class CommonCurveTestsMixin(object):
             self.assertEquals(None, self.curve.double_point(None))
 
     def test_multiplication(self):
-        self.assertEquals(self.MUL_P_1, montgomery_ladder(self.MUL_K_1, self.bp, self.curve))
-        self.assertEquals(self.MUL_P_2, montgomery_ladder(self.MUL_K_2, self.bp, self.curve))
+        self.assertEquals(self.MUL_P_1, mul(self.MUL_K_1, self.bp, self.curve))
+        self.assertEquals(self.MUL_P_2, mul(self.MUL_K_2, self.bp, self.curve))
 
     def test_generator(self):
-        self.assertEquals(self.curve.neutral_point(), montgomery_ladder(self.bp_order, self.bp, self.curve))
+        self.assertEquals(self.curve.neutral_point(), mul(self.bp_order, self.bp, self.curve))
 
 
 class ProjectiveCoordinateTestsMixin(object):
@@ -100,14 +100,14 @@ class ProjectiveCoordinateTestsMixin(object):
         self.assertEquals(
             self.MUL_P_1,
             self.curve.projective_to_affine(
-                montgomery_ladder_projective(self.MUL_K_1,
+                mul_projective(self.MUL_K_1,
                                              self.curve.affine_to_projective(self.bp),
                                              self.curve)))
 
         self.assertEquals(
             self.MUL_P_2,
             self.curve.projective_to_affine(
-                montgomery_ladder_projective(self.MUL_K_2,
+                mul_projective(self.MUL_K_2,
                                              self.curve.affine_to_projective(self.bp),
                                              self.curve)))
 

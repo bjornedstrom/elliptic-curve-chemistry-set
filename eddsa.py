@@ -88,7 +88,7 @@ class Ed25519(object):
 
         a = a_new
 
-        A = montgomery_ladder(a, self.bp, self.curve)
+        A = mul(a, self.bp, self.curve)
         return self.encodepoint(A)
 
     def generate_key_pair_from_seed(self, sk):
@@ -100,7 +100,7 @@ class Ed25519(object):
         priv[31] |= 64
         priv = le2int(''.join(map(chr,priv)))
 
-        pub = montgomery_ladder(priv, self.bp, self.curve)
+        pub = mul(priv, self.bp, self.curve)
         return (pub, priv)
 
     def generate_random_k_from_seed(self, sk):
@@ -119,7 +119,7 @@ class Ed25519(object):
         # r = "k" || m
         r = self.Hint(''.join([h[i] for i in range(self.b/8,self.b/4)]) + m)
         #R = scalarmult(B,r)
-        R = montgomery_ladder(r, self.bp, self.curve)
+        R = mul(r, self.bp, self.curve)
         S = (r + self.Hint(self.encodepoint(R) + pk + m) * a) % self.L
         return self.encodepoint(R) + self.encodeint(S)
 
@@ -135,7 +135,7 @@ class Ed25519(object):
         print ['sign', M, k, A, a]
 
         r = self.Hint(k + M)
-        R = montgomery_ladder(r, self.bp, self.curve)
+        R = mul(r, self.bp, self.curve)
         S = (r + self.Hint(self.encodepoint(R) + self.encodepoint(A) + M) * a) % self.L
 
         return self.encodepoint(R) + self.encodeint(S)
@@ -173,7 +173,7 @@ class Ed25519(object):
         S = self.decodeint(s[self.b/8:self.b/4])
         h = self.Hint(self.encodepoint(R) + pk + m)
         #if scalarmult(B,S) != edwards(R,scalarmult(A,h)):
-        if montgomery_ladder(S, self.bp, self.curve) != self.curve.add_points(R, montgomery_ladder(h, A, self.curve)):
+        if mul(S, self.bp, self.curve) != self.curve.add_points(R, mul(h, A, self.curve)):
             raise Exception("signature does not pass verification")
 
 class Ed41417(Ed25519):
@@ -197,7 +197,7 @@ class Ed41417(Ed25519):
         priv[51] |= 64
         priv = le2int(''.join(map(chr,priv)))
 
-        pub = montgomery_ladder(priv, self.bp, self.curve)
+        pub = mul(priv, self.bp, self.curve)
         return (pub, priv)
 
     def generate_random_k_from_seed(self, sk):

@@ -8,4 +8,4 @@ def ecdh(curve_obj, my_private, other_public):
     """Derive the shared secret in ECDH."""
 
     # here curve_obj is from asymmetric.ECCBase
-    return curve.montgomery_ladder(my_private, other_public, curve_obj.curve)
+    return curve.mul(my_private, other_public, curve_obj.curve)
