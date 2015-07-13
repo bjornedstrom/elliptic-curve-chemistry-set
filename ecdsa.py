@@ -103,4 +103,4 @@ def ecdsa_verify(curve_obj, hash_int, hash_num_bits, public_key, message, signat
         curve.mul(u_2, public_key, curve_obj.curve)
         )
 
-    return (r % curve_obj.order) == x1
+    return (r % curve_obj.order) == (x1 % curve_obj.order)
