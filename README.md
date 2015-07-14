@@ -18,6 +18,7 @@ This code is meant for experimentation and educational purposes, it is not meant
 - Completely trivial code for arithmetic in GF(p).
 - Some code for ECDH.
 - Some code for ECDSA including breaking ECDSA in case it's misused.
+- A likely broken implementation of some X9.63 binary encodings.
 
 ## License
 
