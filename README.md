@@ -17,7 +17,7 @@ This code is meant for experimentation and educational purposes, it is not meant
 - Point decompressing.
 - Completely trivial code for arithmetic in GF(p).
 - Some code for ECDH.
-- Some code for ECDSA.
+- Some code for ECDSA including breaking ECDSA in case it's misused.
 
 ## License
 
