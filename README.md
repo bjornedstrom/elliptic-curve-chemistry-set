@@ -2,7 +2,7 @@
 
 My Python code for experimenting with elliptic curves over finite fields, and elliptic curve cryptography.
 
-This code is meant for experimentation and educational purposes, it is not meant to be used in real life scenarios.
+***This code is meant for experimentation and educational purposes ONLY, it is not meant to be used in real world cryptographic applications.***
 
 ## Experiments
 
